@@ -259,3 +259,36 @@ body {
     font-size: 14px;
     line-height: 1.3;
 }
+.logs-live-box {
+    height: 260px;
+    overflow-y: auto;
+    background: #0d0d0f;
+    border: 1px solid #222;
+    padding: 6px;
+    font-family: monospace;
+    font-size: 12px;
+    line-height: 1.25;
+    color: #eee;
+}
+
+.log-live-entry {
+    padding: 2px 0;
+    border-bottom: 1px solid #222;
+}
+
+.log-live-ok {
+    color: #00ff88;
+}
+
+.log-live-warn {
+    color: #ffaa00;
+}
+
+.log-live-error {
+    color: #ff4444;
+}
+
+.log-live-time {
+    color: #888;
+    margin-right: 6px;
+}
