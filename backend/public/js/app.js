@@ -2,7 +2,7 @@
 // APP.JS PRO+++ — Cockpit IFR EBLG
 // ======================================================
 
-import { initMap, resetMapView, toggleNoiseHeatmap } from "./map.js";
+import { initMap, toggleNoiseHeatmap } from "./map.js";
 import { updateADSB } from "./map.js";
 import { initMetar, safeLoadMetar } from "./metar.js";
 import { safeLoadTaf } from "./taf.js";
@@ -66,8 +66,9 @@ window.addEventListener("DOMContentLoaded", () => {
     // 7) Bouton reset map
     const resetMapBtn = document.getElementById("btn-reset-map");
     if (resetMapBtn) {
-        resetMapBtn.addEventListener("click", () => resetMapView());
-    }
+       resetMapBtn.addEventListener("click", () => {
+    window.map.setView([50.645, 5.46], 12);
+});
 
     // 8) Heatmap ON/OFF
     let noiseHeatmapEnabled = true;
