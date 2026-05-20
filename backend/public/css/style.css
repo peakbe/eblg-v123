@@ -372,3 +372,47 @@ body {
     overflow-y: auto;
     font-size: 12px;
 }
+/* ======================================================
+   FIDS — PRO+++ cockpit IFR
+   ====================================================== */
+
+#panel-fids h3 {
+    margin: 4px 0;
+    font-size: 14px;
+    color: #0ff;
+}
+
+.fids-row {
+    display: grid;
+    grid-template-columns: 70px 1fr 60px 80px;
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 12px;
+}
+
+.fids-row:hover {
+    background: rgba(255,255,255,0.05);
+}
+
+.fids-flight {
+    font-weight: 600;
+}
+
+.fids-city {
+    opacity: 0.8;
+}
+
+.fids-time {
+    font-family: monospace;
+}
+
+.fids-status {
+    text-align: right;
+    font-weight: 600;
+}
+
+.fids-empty {
+    opacity: 0.5;
+    font-size: 12px;
+    padding: 6px;
+}
