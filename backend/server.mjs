@@ -314,9 +314,81 @@ app.get("/fids", (req, res) => {
 // ======================================================
 import sonometers from "./sonometers-data.js";
 
+// ======================================================
+// 1) CONSTANTES PISTES
+// ======================================================
+const RUNWAYS = {
+    "22": { lat: 50.6435, lon: 5.4430 },
+    "04": { lat: 50.6465, lon: 5.4590 }
+};
+
+let ACTIVE_RUNWAY = "22";
+
+// ======================================================
+// 2) HAVERSINE (distance en mètres)
+// ======================================================
+function haversine(lat1, lon1, lat2, lon2) {
+    const R = 6371000;
+    const toRad = x => (x * Math.PI) / 180;
+    const dLat = toRad(lat2 - lat1);
+    const dLon = toRad(lon2 - lon1);
+    const a =
+        Math.sin(dLat / 2) ** 2 +
+        Math.cos(toRad(lat1)) *
+            Math.cos(toRad(lat2)) *
+            Math.sin(dLon / 2) ** 2;
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+}
+
+// ======================================================
+// 3) MODELE ACOUSTIQUE
+// ======================================================
+function computeSimulatedDb(sensor, activeRunway, wind, trafficIndex) {
+    const base = 40;
+
+    const rw = RUNWAYS[activeRunway];
+    const d = rw ? haversine(sensor.lat, sensor.lon, rw.lat, rw.lon) : 2000;
+
+    const distanceLoss = 20 * Math.log10(Math.max(d, 100) / 100);
+
+    const name = sensor.name.toUpperCase();
+    const runwayBoost =
+        (name.includes("NORD") && activeRunway === "22") ||
+        (name.includes("SUD") && activeRunway === "04")
+            ? 8
+            : 0;
+
+    const trafficBoost = Math.log10(trafficIndex + 1) * 5;
+
+    const L0 = 70 + runwayBoost + trafficBoost;
+
+    let L = L0 - distanceLoss;
+
+    L = Math.max(35, Math.min(80, L));
+
+    const jitter = (Math.random() - 0.5) * 2;
+    L += jitter;
+
+    return Math.round(L * 10) / 10;
+}
+
+// ======================================================
+// 4) ENDPOINT /sonos
+// ======================================================
 app.get("/sonos", (req, res) => {
-    res.json({ sensors: sonometers });
+    const trafficIndex = 8;
+    const wind = { dir: 270, kt: 8 };
+
+    const sensors = sonometers.map(s => ({
+        ...s,
+        db: computeSimulatedDb(s, ACTIVE_RUNWAY, wind, trafficIndex)
+    }));
+
+    res.json({ sensors });
 });
+
+
 
 // ======================================================
 // ADS-B — AIRLABS PRO++ (cache + normalisation + filtres)
