@@ -5,6 +5,7 @@
 
 import { ENDPOINTS } from "./config.js";
 import { fetchJSON, updateStatusPanel } from "./helpers.js";
+import { map } from "./map.js";
 
 const IS_DEV = location.hostname.includes("localhost") || location.hostname.includes("127.0.0.1");
 const log = (...a) => IS_DEV && console.log("[SONO]", ...a);
