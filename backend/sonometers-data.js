@@ -78,7 +78,7 @@ status: "OK"},
         name: "F008",
         lat: 50.594878,
         lon: 5.358950,
-        db: 46,v
+        db: 46,
         address: "Rue Warfusée", 
         town: "Saint-Georges",
         status: "OK"},
