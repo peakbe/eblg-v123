@@ -28,15 +28,14 @@ window.addEventListener("DOMContentLoaded", () => {
     initMap();
     initDebugPanel();
 
-    // Quand Leaflet est vraiment prêt → on charge les modules dépendants de la carte
-    map.whenReady(() => {
-        console.log("[MAP] Leaflet prêt — chargement modules dépendants…");
-
+    // Modules dépendants de la carte → léger délai pour laisser Leaflet finir
+    setTimeout(() => {
+        console.log("[MAP] Init terminée — chargement modules dépendants…");
         safeLoadFids();
-        loadSonometers();      // markers OK
+        loadSonometers();      // markers + heatmap
         loadLogs();
         startLiveLogs();
-    });
+    }, 300);
 
     // Météo (indépendant de la carte)
     initMetar();
