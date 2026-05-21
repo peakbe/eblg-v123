@@ -96,9 +96,9 @@ function startAdsbLoop() {
             if (!r.ok) throw new Error("HTTP " + r.status);
 
             const json = await r.json();
-            const list = Array.isArray(json) ? json : (json.aircraft || []);
-
+            const list = json.ac || [];
             updateADSB(list);
+
         } catch (err) {
             console.error("[ADSB] Erreur", err);
         } finally {
