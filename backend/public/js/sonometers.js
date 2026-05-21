@@ -13,6 +13,8 @@ const logErr = (...a) => console.error("[SONO ERROR]", ...a);
 
 let sonoDataRaw = [];
 let sonoMarkersLayer = null;
+let noiseHeatmapLayer = null;
+let heatmapEnabled = false;
 
 // ------------------------------------------------------
 // API PUBLIC — appelée par app.js
@@ -134,6 +136,50 @@ function renderSonometers() {
     renderSonoList(list);
     renderSonoMarkers(list);
 }
+
+// ------------------------------------------------------
+// Rendu heatmap
+// ------------------------------------------------------
+
+function renderNoiseHeatmap(list) {
+    if (!map) return;
+
+    if (noiseHeatmapLayer) {
+        map.removeLayer(noiseHeatmapLayer);
+        noiseHeatmapLayer = null;
+    }
+
+    if (!heatmapEnabled) return;
+
+    const points = list
+        .filter(s => s.lat && s.lon && s.db != null)
+        .map(s => [
+            s.lat,
+            s.lon,
+            Math.max(0.1, (s.db - 30) / 40) // normalisation 30–70 dB → 0.1–1
+        ]);
+
+    noiseHeatmapLayer = L.heatLayer(points, {
+        radius: 35,
+        blur: 20,
+        maxZoom: 17,
+        minOpacity: 0.25,
+        gradient: {
+            0.0: "lime",
+            0.5: "yellow",
+            1.0: "red"
+        }
+    });
+
+    noiseHeatmapLayer.addTo(map);
+}
+
+export function updateNoiseHeatmap(list) {
+    if (!heatmapEnabled) return;
+    renderNoiseHeatmap(list);
+}
+
+renderNoiseHeatmap(list);
 
 // ------------------------------------------------------
 // Rendu liste
