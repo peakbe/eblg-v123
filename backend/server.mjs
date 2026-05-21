@@ -312,53 +312,10 @@ app.get("/fids", (req, res) => {
 // ======================================================
 // SONOMETERS — MODE AUTONOME PRO+++
 // ======================================================
-app.get("/sonos", (req, res) => {
-    const payload = {
-        sensors: [
-            {
-                id: 1,
-                name: "NORD",
-                lat: 50.646,
-                lon: 5.445,
-                db: 42,
-                address: "Nord EBLG",
-                town: "Grâce-Hollogne",
-                status: "OK"
-            },
-            {
-                id: 2,
-                name: "SUD",
-                lat: 50.635,
-                lon: 5.460,
-                db: 48,
-                address: "Sud EBLG",
-                town: "Grâce-Hollogne",
-                status: "OK"
-            },
-            {
-                id: 3,
-                name: "EST",
-                lat: 50.640,
-                lon: 5.470,
-                db: 51,
-                address: "Est EBLG",
-                town: "Grâce-Hollogne",
-                status: "OK"
-            },
-            {
-                id: 4,
-                name: "OUEST",
-                lat: 50.642,
-                lon: 5.430,
-                db: 39,
-                address: "Ouest EBLG",
-                town: "Grâce-Hollogne",
-                status: "OK"
-            }
-        ]
-    };
+import sonometers from "./sonometers-data.js";
 
-    res.json(payload);
+app.get("/sonos", (req, res) => {
+    res.json({ sensors: sonometers });
 });
 
 // ======================================================
