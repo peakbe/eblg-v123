@@ -309,6 +309,23 @@ app.get("/fids", (req, res) => {
     res.json({ flights });
 });
 
+// Ajouter la logique piste active
+
+function getActiveRunwayFromWind(windDir) {
+    if (windDir == null) return "22";
+
+    const heading22 = 220;
+    const heading04 = 40;
+
+    const d22 = Math.abs(windDir - heading22);
+    const d04 = Math.abs(windDir - heading04);
+
+    const n22 = Math.min(d22, 360 - d22);
+    const n04 = Math.min(d04, 360 - d04);
+
+    return n22 < n04 ? "22" : "04";
+}
+
 // ======================================================
 // SONOMETERS — MODE AUTONOME PRO+++
 // ======================================================
@@ -376,9 +393,18 @@ function computeSimulatedDb(sensor, activeRunway, wind, trafficIndex) {
 // ======================================================
 // 4) ENDPOINT /sonos
 // ======================================================
-app.get("/sonos", (req, res) => {
-    const trafficIndex = 8;
-    const wind = { dir: 270, kt: 8 };
+
+// Récupérer le vent réel depuis METAR
+import { getMetar } from "./metar.js";
+
+app.get("/sonos", async (req, res) => {
+    const metar = await getMetar(); // vent réel
+    const windDir = metar?.wind?.dir ?? 220;
+
+    const ACTIVE_RUNWAY = getActiveRunwayFromWind(windDir);
+
+    const trafficIndex = 8; // tu pourras le brancher sur ADS-B
+    const wind = { dir: windDir, kt: metar?.wind?.speed ?? 5 };
 
     const sensors = sonometers.map(s => ({
         ...s,
