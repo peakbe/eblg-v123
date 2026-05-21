@@ -178,14 +178,14 @@ function renderSonoList(list) {
 // Rendu markers sur la carte
 // ------------------------------------------------------
 function renderSonoMarkers(list) {
-    if (!window.map) {
-        logErr("window.map non défini, impossible de rendre les markers");
+    if (!import { map } from "./map.js";) {
+        logErr("import { map } from "./map.js"; non défini, impossible de rendre les markers");
         return;
     }
 
     if (sonoMarkersLayer) {
         sonoMarkersLayer.clearLayers();
-        window.map.removeLayer(sonoMarkersLayer);
+        import { map } from "./map.js";.removeLayer(sonoMarkersLayer);
     }
 
     sonoMarkersLayer = L.layerGroup();
@@ -207,7 +207,9 @@ function renderSonoMarkers(list) {
         sonoMarkersLayer.addLayer(m);
     });
 
-    sonoMarkersLayer.addTo(window.map);
+    if (!map) return;
+sonoMarkersLayer.addTo(map);
+
 }
 
 // ------------------------------------------------------
@@ -242,8 +244,8 @@ function unhighlightListItem(id) {
 }
 
 function focusOnSensor(s) {
-    if (!window.map) return;
-    window.map.setView([s.lat, s.lon], 15);
+    if (!import { map } from "./map.js";) return;
+    import { map } from "./map.js";.setView([s.lat, s.lon], 15);
 }
 
 // ------------------------------------------------------
