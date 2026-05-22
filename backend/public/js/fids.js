@@ -2,6 +2,14 @@
 // FIDS.JS — Cockpit IFR EBLG PRO+++
 // Compatible API officielle Liège Airport
 // ======================================================
+const AIRLINE_LOGOS = {
+    "TNT": "tnt.png",
+    "ASL": "tnt.png",
+    "QATAR": "qatar.png",
+    "ETHIOPIAN": "ethiopian.png",
+    "FEDEX": "fedex.png",
+    "FX": "fedex.png"
+};
 
 import { ENDPOINTS } from "./config.js";
 import { fetchJSON, updateStatusPanel } from "./helpers.js";
