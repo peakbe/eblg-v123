@@ -92,12 +92,42 @@ export function toggleNoiseHeatmap(enabled) {
 // ------------------------------------------------------
 // 4) Markers sonomètres
 // ------------------------------------------------------
+// ======================================================
+// COULEUR SONOMÈTRE — Normalisation PRO+++
+// ======================================================
+export function getSonoColor(name, runway) {
+    if (!name || !runway) return "blue";
+
+    // Normalisation ID
+    const id = String(name).trim().toUpperCase();
+
+    // Récupération config piste
+    const cfg = window.SONO_RUNWAY_CONFIG?.[runway];
+    if (!cfg) return "blue";
+
+    // Normalisation listes
+    const greens = cfg.green.map(x => x.trim().toUpperCase());
+    const reds   = cfg.red.map(x => x.trim().toUpperCase());
+
+    // Décision couleur
+    if (greens.includes(id)) return "green";
+    if (reds.includes(id)) return "red";
+
+    return "blue"; // fallback neutre
+}
+
+
+
+// ======================================================
+// RENDU DES SONOMÈTRES — Cockpit IFR PRO+++
+// ======================================================
 export function renderSonometers(sensors) {
     if (!window._map) {
         console.error("[SONO ERROR] Carte non initialisée");
         return;
     }
 
+    // Supprime ancienne couche
     if (window._sonoLayer) {
         window._map.removeLayer(window._sonoLayer);
     }
@@ -105,9 +135,10 @@ export function renderSonometers(sensors) {
     const group = L.layerGroup();
 
     sensors.forEach(s => {
+        // Couleur correcte selon piste active
         const color = getSonoColor(s.name, window.ACTIVE_RUNWAY);
-        
-       const marker = L.circleMarker([s.lat, s.lon], {
+
+        const marker = L.circleMarker([s.lat, s.lon], {
             radius: 8,
             color: color,
             fillColor: color,
@@ -129,26 +160,6 @@ export function renderSonometers(sensors) {
     group.addTo(window._map);
 }
 
-export function getSonoColor(name, runway) {
-    if (!name || !runway) return "blue";
-
-    // Normalisation ID
-    const id = String(name).trim().toUpperCase();
-
-    // Récupération config piste
-    const cfg = window.SONO_RUNWAY_CONFIG?.[runway];
-    if (!cfg) return "blue";
-
-    // Normalisation listes
-    const greens = cfg.green.map(x => x.trim().toUpperCase());
-    const reds   = cfg.red.map(x => x.trim().toUpperCase());
-
-    // Décision couleur
-    if (greens.includes(id)) return "green";
-    if (reds.includes(id)) return "red";
-
-    return "blue"; // fallback neutre
-}
 // ------------------------------------------------------
 // 5) Panneau dB réel
 // ------------------------------------------------------
