@@ -21,13 +21,17 @@ export async function safeLoadFids() {
     try {
         const data = await fetchJSON(ENDPOINTS.fids);
 
-        if (!data || !Array.isArray(data.arrivals) || !Array.isArray(data.departures)) {
-            console.error("[FIDS] Données invalides", data);
+        // Sécurisation PRO+++
+        const arrivals   = Array.isArray(data?.arrivals)   ? data.arrivals   : [];
+        const departures = Array.isArray(data?.departures) ? data.departures : [];
+
+        if (arrivals.length === 0 && departures.length === 0) {
+            console.warn("[FIDS] Aucun vol reçu", data);
             updateStatusPanel("FIDS", { error: true });
             return;
         }
 
-        renderFids(data.arrivals, data.departures);
+        renderFids(arrivals, departures);
         updateStatusPanel("FIDS", { ok: true });
 
     } catch (err) {
@@ -36,24 +40,45 @@ export async function safeLoadFids() {
     }
 }
 
+
 // ------------------------------------------------------
 // RENDU PRINCIPAL
 // ------------------------------------------------------
-function renderFids(arrivals, departures) {
+export function renderFids(arrivals, departures) {
+
     const arrEl = document.getElementById("fids-arrivals");
     const depEl = document.getElementById("fids-departures");
 
-    if (!arrEl || !depEl) return;
+    arrEl.innerHTML = "";
+    depEl.innerHTML = "";
 
-    sortByTime(arrivals);
-    sortByTime(departures);
+    // ARRIVALS
+    arrivals
+        .sort((a,b) => new Date(a.date) - new Date(b.date))
+        .forEach(f => {
+            arrEl.innerHTML += `
+                <div class="fids-row">
+                    <span class="fids-flight">${f.flightNumber}</span>
+                    <span class="fids-from">${f.origin}</span>
+                    <span class="fids-time">${formatTime(f.date)}</span>
+                    <span class="fids-stand">${f.stand || "-"}</span>
+                </div>
+            `;
+        });
 
-    // Limite à 10 vols
-    arrivals = arrivals.slice(0, 10);
-    departures = departures.slice(0, 10);
-
-    arrEl.innerHTML = renderSection("Arrivées", arrivals);
-    depEl.innerHTML = renderSection("Départs", departures);
+    // DEPARTURES
+    departures
+        .sort((a,b) => new Date(a.date) - new Date(b.date))
+        .forEach(f => {
+            depEl.innerHTML += `
+                <div class="fids-row">
+                    <span class="fids-flight">${f.flightNumber}</span>
+                    <span class="fids-to">${f.destination}</span>
+                    <span class="fids-time">${formatTime(f.date)}</span>
+                    <span class="fids-stand">${f.stand || "-"}</span>
+                </div>
+            `;
+        });
 }
 
 // ------------------------------------------------------
