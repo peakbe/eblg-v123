@@ -106,6 +106,27 @@ export function renderSonometers(sensors) {
 
     sensors.forEach(s => {
         const color = getSonoColor(s.name, window.ACTIVE_RUNWAY);
+        
+export function getSonoColor(name, runway) {
+    if (!name || !runway) return "blue";
+
+    // Normalisation ID
+    const id = String(name).trim().toUpperCase();
+
+    // Récupération config piste
+    const cfg = window.SONO_RUNWAY_CONFIG?.[runway];
+    if (!cfg) return "blue";
+
+    // Normalisation listes
+    const greens = cfg.green.map(x => x.trim().toUpperCase());
+    const reds   = cfg.red.map(x => x.trim().toUpperCase());
+
+    // Décision couleur
+    if (greens.includes(id)) return "green";
+    if (reds.includes(id)) return "red";
+
+    return "blue"; // fallback neutre
+}
 
         const marker = L.circleMarker([s.lat, s.lon], {
             radius: 8,
