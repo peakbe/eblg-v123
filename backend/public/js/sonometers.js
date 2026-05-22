@@ -42,6 +42,14 @@ let heatLayer = null;
 function renderHeatmap(sensors) {
     if (!window._map) return;
 
+    // Empêche le crash si la carte n’a pas encore de taille
+    const size = window._map.getSize();
+    if (size.x === 0 || size.y === 0) {
+        console.warn("[HEATMAP] Carte pas encore prête → retry dans 200ms");
+        setTimeout(() => renderHeatmap(sensors), 200);
+        return;
+    }
+
     if (heatLayer) {
         window._map.removeLayer(heatLayer);
     }
@@ -49,7 +57,7 @@ function renderHeatmap(sensors) {
     const points = sensors.map(s => [
         s.lat,
         s.lon,
-        Math.max(0.1, (s.db - 35) / 50) // normalisation
+        Math.max(0.1, (s.db - 35) / 50)
     ]);
 
     heatLayer = L.heatLayer(points, {
@@ -60,6 +68,7 @@ function renderHeatmap(sensors) {
 
     heatLayer.addTo(window._map);
 }
+
 
 // ------------------------------------------------------
 // 4) Markers sonomètres
