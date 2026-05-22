@@ -21,17 +21,28 @@ const RUNWAY_COLOR_MAP = {
     }
 };
 
-// ------------------------------------------------------
-// 2) Déterminer couleur d’un sonomètre
-// ------------------------------------------------------
-function getSonoColor(id, activeRunway) {
-    const map = RUNWAY_COLOR_MAP[activeRunway];
-    if (!map) return "gray";
+// ======================================================
+// COULEUR SONOMÈTRE — Normalisation PRO+++
+// ======================================================
+export function getSonoColor(name, runway) {
+    if (!name || !runway) return "blue";
 
-    if (map.green.includes(id)) return "green";
-    if (map.red.includes(id)) return "red";
+    // Normalisation ID
+    const id = String(name).trim().toUpperCase();
 
-    return "gray";
+    // Récupération config piste
+    const cfg = window.SONO_RUNWAY_CONFIG?.[runway];
+    if (!cfg) return "blue";
+
+    // Normalisation listes
+    const greens = cfg.green.map(x => x.trim().toUpperCase());
+    const reds   = cfg.red.map(x => x.trim().toUpperCase());
+
+    // Décision couleur
+    if (greens.includes(id)) return "green";
+    if (reds.includes(id)) return "red";
+
+    return "blue"; // fallback neutre
 }
 
 // ------------------------------------------------------
@@ -89,32 +100,6 @@ export function toggleNoiseHeatmap(enabled) {
 }
 
 
-// ------------------------------------------------------
-// 4) Markers sonomètres
-// ------------------------------------------------------
-// ======================================================
-// COULEUR SONOMÈTRE — Normalisation PRO+++
-// ======================================================
-export function getSonoColor(name, runway) {
-    if (!name || !runway) return "blue";
-
-    // Normalisation ID
-    const id = String(name).trim().toUpperCase();
-
-    // Récupération config piste
-    const cfg = window.SONO_RUNWAY_CONFIG?.[runway];
-    if (!cfg) return "blue";
-
-    // Normalisation listes
-    const greens = cfg.green.map(x => x.trim().toUpperCase());
-    const reds   = cfg.red.map(x => x.trim().toUpperCase());
-
-    // Décision couleur
-    if (greens.includes(id)) return "green";
-    if (reds.includes(id)) return "red";
-
-    return "blue"; // fallback neutre
-}
 
 
 
