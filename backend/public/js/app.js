@@ -13,6 +13,9 @@ import { initMetar, safeLoadMetar } from "./metar.js";
 import { initTaf, safeLoadTaf } from "./taf.js";
 import { safeLoadFids } from "./fids.js";
 import { loadSonometers } from "./sonometers.js";
+window.addEventListener("map-ready", () => {
+    loadSonometers();
+});
 import { checkApiStatus } from "./status.js";
 import { loadLogs } from "./logs.js";
 import { startLiveLogs } from "./logsLive.js";
@@ -31,11 +34,7 @@ window.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => {
         console.log("[MAP] Init terminée — chargement modules dépendants…");
         safeLoadFids();
-        
-        window.addEventListener("map-ready", () => {
-    loadSonometers();
-});
-
+        loadSonometers();
         loadLogs();
         startLiveLogs();
     }, 300);
