@@ -120,3 +120,34 @@ export function updateNoiseHeatmap(list) {
     if (!heatmapEnabled) return;
     renderNoiseHeatmap(list);
 }
+const dbPanel = document.getElementById("db-panel");
+const dbToggle = document.getElementById("db-toggle");
+const dbClose = document.getElementById("db-close");
+
+dbToggle.onclick = () => dbPanel.classList.toggle("hidden");
+dbClose.onclick = () => dbPanel.classList.add("hidden");
+
+export function updateDbPanel(payload) {
+    const { runway, wind, trafficIndex, sensors } = payload;
+
+    document.getElementById("db-runway").textContent = runway;
+    document.getElementById("db-wind").textContent =
+        `${wind.dir}° / ${wind.kt} kt`;
+    document.getElementById("db-traffic").textContent =
+        `${trafficIndex} avions`;
+
+    const list = document.getElementById("db-list");
+    list.innerHTML = "";
+
+    sensors.forEach(s => {
+        const div = document.createElement("div");
+        div.className = "db-item";
+
+        div.innerHTML = `
+            <span class="db-item-name">${s.name}</span>
+            <span class="db-item-value">${s.db} dB</span>
+        `;
+
+        list.appendChild(div);
+    });
+}
