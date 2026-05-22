@@ -130,3 +130,20 @@ function getStatusClass(s) {
 
     return "st-unknown";
 }
+
+// ------------------------------------------------------
+// affichage logo
+// ------------------------------------------------------
+function getAirlineLogo(flight) {
+    if (!flight || !flight.airline) return null;
+
+    const name = flight.airline.toUpperCase();
+
+    for (const key in AIRLINE_LOGOS) {
+        if (name.includes(key)) {
+            return `/assets/logos/${AIRLINE_LOGOS[key]}`;
+        }
+    }
+
+    return null;
+}
