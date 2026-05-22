@@ -100,7 +100,7 @@ function drawRunways() {
                 [thr.lat, thr.lon],
                 [end.lat, end.lon]
             ],
-            { color: "#ff8800", weight: 5, opacity 0.95 } // orange cockpit
+            { color: "#ff8800", weight: 5, opacity: 0.95 } // orange cockpit
             
         ).addTo(runwayLayer);
 
