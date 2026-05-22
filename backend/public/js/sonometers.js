@@ -69,6 +69,25 @@ function renderHeatmap(sensors) {
     heatLayer.addTo(window._map);
 }
 
+// ------------------------------------------------------
+//  bouton ON/OFF pour la heatmap
+// ------------------------------------------------------
+export function toggleNoiseHeatmap(enabled) {
+    if (!window._map) return;
+
+    if (!enabled) {
+        if (heatLayer) {
+            window._map.removeLayer(heatLayer);
+        }
+        return;
+    }
+
+    // Si ON → on redessine la heatmap avec les dernières données
+    if (window._lastSonoData) {
+        renderHeatmap(window._lastSonoData);
+    }
+}
+
 
 // ------------------------------------------------------
 // 4) Markers sonomètres
