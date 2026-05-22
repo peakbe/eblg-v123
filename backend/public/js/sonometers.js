@@ -166,6 +166,36 @@ function renderSonoDebugLabels(sensors) {
     debugLayer.addTo(window._map);
 }
 
+// Fonction PRO+++ pour afficher ID + dB + couleur piste
+function renderSonoDebugAdvanced(sensors) {
+    if (!window._map || !window.SONO_DEBUG_ADV) return;
+
+    if (sonoDebugLayer) {
+        window._map.removeLayer(sonoDebugLayer);
+    }
+
+    sonoDebugLayer = L.layerGroup();
+
+    sensors.forEach(s => {
+        const id = String(s.name).trim().toUpperCase();
+        const color = getSonoColor(id, window.ACTIVE_RUNWAY).toUpperCase();
+
+        const label = L.marker([s.lat, s.lon], {
+            icon: L.divIcon({
+                className: "sono-debug-adv-label",
+                html: `${id} — ${s.db} dB — ${color}`,
+                iconSize: [120, 16],
+                iconAnchor: [60, -22]
+            }),
+            interactive: false
+        });
+
+        sonoDebugLayer.addLayer(label);
+    });
+
+    sonoDebugLayer.addTo(window._map);
+}
+
 // ======================================================
 // RENDU DES SONOMÈTRES — Cockpit IFR PRO+++
 // ======================================================
