@@ -324,6 +324,7 @@ window._lastSonoData = json.sensors;
        window.ACTIVE_RUNWAY = json.runway;
 
 drawDynamicNoiseZones(window.ACTIVE_RUNWAY);   // ← ajout PRO+++
+drawAcousticCorridor(window.ACTIVE_RUNWAY);
 renderSonometers(json.sensors);
 renderHeatmap(json.sensors);
 renderHeatmapDebug(json.sensors);
