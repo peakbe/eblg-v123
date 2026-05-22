@@ -226,3 +226,14 @@ body {
     text-align: center;
     pointer-events: none;
 }
+
+.heatmap-debug-label {
+    font-size: 11px;
+    font-weight: bold;
+    color: #ff0;
+    background: rgba(0,0,0,0.65);
+    padding: 1px 4px;
+    border-radius: 3px;
+    text-align: center;
+    pointer-events: none;
+}
