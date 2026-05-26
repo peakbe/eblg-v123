@@ -8,6 +8,8 @@ import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
 
+import { EBLG } from "./constants.js";
+
 import {
     getCachedMetar,
     setCachedMetar,
@@ -39,8 +41,6 @@ app.use(express.static(publicDir));
 // ======================================================
 // CONSTANTES EBLG / PISTES
 // ======================================================
-import { EBLG } from "./constants.js";
-
 const RWY = {
     "04": { lat: 50.64594, lon: 5.44321, heading: 40 },
     "22": { lat: 50.63302, lon: 5.46163, heading: 220 }
@@ -518,7 +518,6 @@ app.get("/api/adsb", async (req, res) => {
 // ======================================================
 // Backend radar — logique type - centre EBLG
 // ======================================================
-import { EBLG } from "./constants.js";
 const RADIUS_KM = 150;
 
 app.get("/radar", async (req, res) => {
