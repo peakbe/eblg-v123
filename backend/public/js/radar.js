@@ -1,8 +1,9 @@
 // ======================================================
-// RADAR.JS — Radar quasi temps réel EBLG PRO+++
-// Source : OpenSky (states/all)
-// Filtrage : rayon autour EBLG
-// ======================================================
+// RADAR FRONTEND — Cockpit IFR EBLG PRO+++
+// - Avions orientés selon heading
+// - Couleur selon altitude
+// - Mise à jour fluide
+// ====================================================
 
 import fetch from "node-fetch";
 
