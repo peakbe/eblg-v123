@@ -5,8 +5,6 @@
 // - Mise à jour fluide
 // ====================================================
 
-import fetch from "node-fetch";
-
 // Centre EBLG
 import { EBLG } from "./constants.js";
 const RADIUS_KM = 150;
