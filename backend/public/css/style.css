@@ -308,3 +308,69 @@ body {
     transition: transform 0.3s linear, color 0.3s ease;
 }
 
+/* ======================================================
+   FIDS — STYLE JEPPESEN PRO+++
+   ====================================================== */
+
+.fids-row-jepp {
+    display: grid;
+    grid-template-columns: 90px 1fr 80px 60px 110px;
+    padding: 4px 8px;
+    border-bottom: 1px solid #1a1a1a;
+    font-family: "Consolas", "Roboto Mono", monospace;
+    font-size: 14px;
+    color: #d8e2f0;
+    align-items: center;
+}
+
+.fids-row-jepp:nth-child(even) {
+    background: rgba(255,255,255,0.03);
+}
+
+.fids-col {
+    padding: 2px 4px;
+    white-space: nowrap;
+}
+
+.fids-col.flight {
+    font-weight: 700;
+    color: #9cd2ff;
+}
+
+.fids-col.city {
+    font-weight: 500;
+}
+
+.fids-col.time {
+    font-weight: 600;
+    color: #ffd27f;
+}
+
+.fids-col.stand {
+    text-align: center;
+    color: #b0b0b0;
+}
+
+.fids-col.status {
+    text-align: right;
+    font-weight: 700;
+    padding-right: 6px;
+}
+
+/* STATUTS ATC STYLE JEPPESEN */
+.fids-status-boarding {
+    color: #00eaff;
+}
+
+.fids-status-delayed {
+    color: #ff6b6b;
+}
+
+.fids-status-landed {
+    color: #7dff7d;
+}
+
+.fids-status-ontime {
+    color: #d8e2f0;
+}
+
