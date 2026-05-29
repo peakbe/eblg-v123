@@ -5,19 +5,18 @@
 import { ENDPOINTS } from "./config.js";
 import { fetchJSON, updateStatusPanel } from "./helpers.js";
 
-const ICAO = "EBLG";
-
 // ------------------------------------------------------
-// CHARGEMENT METAR (fonction attendue par app.js)
+// Fonction appelée par app.js
 // ------------------------------------------------------
 async function loadMetar() {
     try {
         const data = await fetchJSON(ENDPOINTS.metar);
 
+        // Backend renvoie parfois { metar: "N/A" }
         if (!data || !data.raw) {
-            console.error("[METAR] Données invalides", data);
-            updateStatusPanel("METAR", { error: true });
+            console.warn("[METAR] Format inattendu:", data);
             renderMetar(null);
+            updateStatusPanel("METAR", { error: true });
             return;
         }
 
@@ -26,40 +25,46 @@ async function loadMetar() {
 
     } catch (err) {
         console.error("[METAR] Erreur loadMetar()", err);
-        updateStatusPanel("METAR", { error: true });
         renderMetar(null);
+        updateStatusPanel("METAR", { error: true });
     }
 }
 
 // ------------------------------------------------------
-// RENDU METAR
+// Rendu METAR
 // ------------------------------------------------------
 function renderMetar(data) {
-    const raw = data?.raw || "";
-    const age = data?.ageMinutes ?? null;
-
     const metarEl = document.getElementById("metar-x");
     const ageEl = document.getElementById("metar-age");
     const rwWindEl = document.getElementById("runway-wind");
     const rwActiveEl = document.getElementById("runway-active");
 
-    if (metarEl) metarEl.textContent = raw || "METAR indisponible";
+    if (!data) {
+        if (metarEl) metarEl.textContent = "METAR indisponible";
+        if (ageEl) ageEl.textContent = "Âge METAR : inconnu";
+        if (rwWindEl) rwWindEl.textContent = "Vent : inconnu";
+        if (rwActiveEl) rwActiveEl.textContent = "Piste active : inconnue";
+        window.activeRunway = null;
+        return;
+    }
 
+    const raw = data.raw;
+    const age = data.ageMinutes ?? null;
+
+    if (metarEl) metarEl.textContent = raw;
     if (ageEl) {
         ageEl.textContent = age != null
             ? `Âge METAR : ${age.toFixed(1)} min`
             : "Âge METAR : inconnu";
     }
 
-    const wind = parseWindFromMetar(raw);
+    const wind = parseWind(raw);
     const activeRw = computeActiveRunway(wind?.dir);
 
     if (rwWindEl && wind) {
         rwWindEl.textContent =
             `Vent ${wind.dir ?? "VRB"}°/${wind.speed} kt` +
             (wind.gust ? ` (rafales ${wind.gust} kt)` : "");
-    } else if (rwWindEl) {
-        rwWindEl.textContent = "Vent : inconnu";
     }
 
     if (rwActiveEl) {
@@ -72,33 +77,27 @@ function renderMetar(data) {
 }
 
 // ------------------------------------------------------
-// PARSING VENT
+// Parsing vent
 // ------------------------------------------------------
-function parseWindFromMetar(raw) {
+function parseWind(raw) {
     if (!raw) return null;
-
     const m = raw.match(/(\d{3}|VRB)(\d{2})(G(\d{2}))?KT/);
     if (!m) return null;
 
-    const dir = m[1] === "VRB" ? null : parseInt(m[1], 10);
-    const speed = parseInt(m[2], 10);
-    const gust = m[4] ? parseInt(m[4], 10) : null;
-
-    return { dir, speed, gust };
+    return {
+        dir: m[1] === "VRB" ? null : parseInt(m[1], 10),
+        speed: parseInt(m[2], 10),
+        gust: m[4] ? parseInt(m[4], 10) : null
+    };
 }
 
 // ------------------------------------------------------
-// PISTE ACTIVE (04 / 22)
+// Piste active
 // ------------------------------------------------------
 function computeActiveRunway(windDir) {
     if (windDir == null || isNaN(windDir)) return null;
-
-    const rwy04 = 40;
-    const rwy22 = 220;
-
-    const diff04 = angleDiff(windDir, rwy04);
-    const diff22 = angleDiff(windDir, rwy22);
-
+    const diff04 = angleDiff(windDir, 40);
+    const diff22 = angleDiff(windDir, 220);
     return diff04 <= diff22 ? "04" : "22";
 }
 
