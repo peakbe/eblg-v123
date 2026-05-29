@@ -1,6 +1,8 @@
 // ======================================================
 // METAR.JS — Cockpit IFR EBLG PRO+++
-// Chargement METAR + parsing vent + piste active
+// - Chargement sécurisé METAR
+// - Parsing vent / piste active
+// - Mise à jour UI (runway-wind, runway-active, metar-x)
 // ======================================================
 
 import { ENDPOINTS } from "./config.js";
@@ -9,26 +11,41 @@ import { fetchJSON, updateStatusPanel } from "./helpers.js";
 const ICAO = "EBLG";
 
 // ------------------------------------------------------
-// CHARGEMENT METAR (fonction attendue par app.js)
+// INIT (appelé une fois au chargement du module si tu veux)
 // ------------------------------------------------------
-async function loadMetar() {
+export function initMetar() {
+    // On expose les fonctions attendues par app.js
+    window.loadMetar = loadMetar;
+    window.initMetar = initMetar;
+}
+
+// ------------------------------------------------------
+// FONCTION PRINCIPALE APPELÉE PAR app.js
+// ------------------------------------------------------
+export async function loadMetar() {
+    // On délègue à la version "safe"
+    await safeLoadMetar();
+}
+
+// ------------------------------------------------------
+// CHARGEMENT SÉCURISÉ
+// ------------------------------------------------------
+export async function safeLoadMetar() {
     try {
         const data = await fetchJSON(ENDPOINTS.metar);
-
         if (!data || !data.raw) {
             console.error("[METAR] Données invalides", data);
             updateStatusPanel("METAR", { error: true });
-            renderMetar(null);
+            renderMetar({ raw: "", ageMinutes: null });
             return;
         }
 
         renderMetar(data);
         updateStatusPanel("METAR", { ok: true });
-
     } catch (err) {
-        console.error("[METAR] Erreur loadMetar()", err);
+        console.error("[METAR] Erreur safeLoadMetar", err);
         updateStatusPanel("METAR", { error: true });
-        renderMetar(null);
+        renderMetar({ raw: "", ageMinutes: null });
     }
 }
 
@@ -36,24 +53,16 @@ async function loadMetar() {
 // RENDU METAR
 // ------------------------------------------------------
 function renderMetar(data) {
+    const raw = data?.raw || "";
+    const age = data?.ageMinutes ?? null;
+
     const metarEl = document.getElementById("metar-x");
     const ageEl = document.getElementById("metar-age");
-    const rwWindEl = document.getElementById("runway-wind");
+    const rwBox = document.getElementById("runway-wind");
     const rwActiveEl = document.getElementById("runway-active");
 
-    if (!data) {
-        if (metarEl) metarEl.textContent = "METAR indisponible";
-        if (ageEl) ageEl.textContent = "Âge METAR : inconnu";
-        if (rwWindEl) rwWindEl.textContent = "Vent : inconnu";
-        if (rwActiveEl) rwActiveEl.textContent = "Piste active : inconnue";
-        window.activeRunway = null;
-        return;
-    }
+    if (metarEl) metarEl.textContent = raw || "METAR indisponible";
 
-    const raw = data.raw || "";
-    const age = data.ageMinutes ?? null;
-
-    if (metarEl) metarEl.textContent = raw;
     if (ageEl) {
         ageEl.textContent = age != null
             ? `Âge METAR : ${age.toFixed(1)} min`
@@ -63,12 +72,12 @@ function renderMetar(data) {
     const wind = parseWindFromMetar(raw);
     const activeRw = computeActiveRunway(wind?.dir);
 
-    if (rwWindEl && wind) {
-        rwWindEl.textContent =
+    if (rwBox && wind) {
+        rwBox.textContent =
             `Vent ${wind.dir ?? "VRB"}°/${wind.speed} kt` +
             (wind.gust ? ` (rafales ${wind.gust} kt)` : "");
-    } else if (rwWindEl) {
-        rwWindEl.textContent = "Vent : inconnu";
+    } else if (rwBox) {
+        rwBox.textContent = "Vent : inconnu";
     }
 
     if (rwActiveEl) {
@@ -77,6 +86,7 @@ function renderMetar(data) {
             : "Piste active : inconnue";
     }
 
+    // On expose la piste active pour les autres modules (sonomètres, etc.)
     window.activeRunway = activeRw || null;
 }
 
@@ -86,7 +96,7 @@ function renderMetar(data) {
 function parseWindFromMetar(raw) {
     if (!raw) return null;
 
-    // Exemples : 25006KT / 25012G20KT / VRB03KT
+    // Exemple : "25006KT" ou "25012G20KT" ou "VRB03KT"
     const m = raw.match(/(\d{3}|VRB)(\d{2})(G(\d{2}))?KT/);
     if (!m) return null;
 
@@ -103,12 +113,14 @@ function parseWindFromMetar(raw) {
 function computeActiveRunway(windDir) {
     if (windDir == null || isNaN(windDir)) return null;
 
+    // Cap piste approximatif
     const rwy04 = 40;
     const rwy22 = 220;
 
     const diff04 = angleDiff(windDir, rwy04);
     const diff22 = angleDiff(windDir, rwy22);
 
+    // On choisit la piste la plus face au vent
     return diff04 <= diff22 ? "04" : "22";
 }
 
@@ -116,9 +128,3 @@ function angleDiff(a, b) {
     let d = Math.abs(a - b) % 360;
     return d > 180 ? 360 - d : d;
 }
-
-// ------------------------------------------------------
-// EXPORTS GLOBAUX (compatibles app.js PRO+++)
-// ------------------------------------------------------
-window.loadMetar = loadMetar;
-window.initMetar = () => {}; // hook optionnel
