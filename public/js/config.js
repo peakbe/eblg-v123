@@ -11,7 +11,7 @@ export const ENDPOINTS = {
     metar:     `${API_BASE}/api/metar`,
     taf:       `${API_BASE}/api/taf`,
     fids:      `${API_BASE}/api/fids`,
-    sonos:     `${API_BASE}/api/sonos`,      // 🔥 clé indispensable
+    sonos:     `${API_BASE}/api/sonos`,   // 🔥 clé indispensable
     radar:     `${API_BASE}/api/radar`,
     logs:      `${API_BASE}/api/logs`,
     logsLive:  `${API_BASE}/api/logs-live`
