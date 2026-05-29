@@ -4,7 +4,7 @@ services:
     env: node
     region: frankfurt
     plan: free
-    rootDir: backend
+    rootDir: .
     buildCommand: "npm install"
     startCommand: "node server.mjs"
     autoDeploy: true
